@@ -20,6 +20,9 @@ def get_authorization_url():
 
 # Exchange the authorization code for an access token
 def get_access_token(code):
+    if not code:
+        print("Code is missing. Cannot get access token")
+        return
     url = "https://github.com/login/oauth/access_token"
     headers = {"Accept": "application/json"}
     data = {
