@@ -1,0 +1,26 @@
+body {
+    margin: 0;
+    font-family: sans_serif
+}
+header {
+    display: flex;
+    align-items: center;
+    background-color: #eeeeee;
+    padding: 10px;
+}
+header .user-box {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+header .user-box img {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #cccccc;
+    border-radius: 50%;
+}
+header .user-box .name {
+    margin-top: 0;
+    margin-bottom: 0;
+}
