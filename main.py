@@ -28,7 +28,6 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             self.redirect(x_authentication_url)
             return
         elif parsed_url.path == "/callback":
-            print("1")
             access_token = user_management.github_oauth_handler.get_access_token(query_params.get("code", [""])[0])
             user_data = user_management.github_oauth_handler.get_user_data(access_token)
             name = user_data["name"]
@@ -49,7 +48,6 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             </html>
             """
             self.wfile.write(html_form.encode("utf-8"))
-            print("2")
             return
         elif parsed_url.path == "/x_callback":
             # access_token = user_management.github_oauth_handler.get_access_token(query_params.get("code", [""])[0])
