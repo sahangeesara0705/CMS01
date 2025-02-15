@@ -21,6 +21,7 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
         elif parsed_url.path == "/login/github":
             github_authentication_url = user_management.github_oauth_handler.get_authorization_url()
             self.redirect(github_authentication_url)
+            return
         elif parsed_url.path == "/login/x":
             x_authentication_url = user_management.x_oauth_handler.get_authorization_url()
             self.redirect(x_authentication_url)
