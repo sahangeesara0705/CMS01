@@ -25,6 +25,7 @@ def setup_database():
             id SERIAL PRIMARY KEY,
             user_id TEXT UNIQUE NOT NULL,
             access_token TEXT NOT NULL,
+            access_token_secret TEXT NOT NULL,
             screen_name TEXT NOT NULL,
             name TEXT NOT NULL,
             profile_image_url TEXT NOT NULL
@@ -46,7 +47,7 @@ def set_session(user_id, access_token, access_token_secret, screen_name, name, p
         INSERT INTO sessions (user_id, access_token, access_token_secret, screen_name, name, profile_image_url)
         VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT (user_id) DO UPDATE SET
-        access_token = EXCLUDED.access_token
+        access_token = EXCLUDED.access_token,
         access_token_secret = EXCLUDED.access_token_secret,
         screen_name = EXCLUDED.screen_name,
         name = EXCLUDED.name,
@@ -55,6 +56,12 @@ def set_session(user_id, access_token, access_token_secret, screen_name, name, p
     conn.commit()
     cur.close()
     conn.close()
+
+    cookie = SimpleCookie()
+    cookie["session_id"] = user_id
+    cookie["session_id"]["path"] = "/"
+    cookie["session_id"]["httponly"] = True
+    return cookie
 
 def get_session(user_id):
     conn = get_db_connection()

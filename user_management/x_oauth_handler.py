@@ -57,6 +57,10 @@ def get_user_data(self, query_params):
                 profile_image_url = "N/A"
 
             return {
+                "user_id": user_id,
+                "access_token": access_token,
+                "access_token_secret": access_token_secret,
+                "screen_name": screen_name,
                 "name": name,
                 "profile_image_url": profile_image_url
             }

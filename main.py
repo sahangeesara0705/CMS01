@@ -3,6 +3,7 @@ import os
 import server.serve_html
 import user_management.github_oauth_handler
 import user_management.x_oauth_handler
+import sessions.session_operations
 from urllib.parse import urlparse, parse_qs, unquote_plus
 
 PORT = 8000
@@ -50,11 +51,18 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             return
         elif parsed_url.path == "/x_callback":
             user_data = user_management.x_oauth_handler.get_user_data(self, query_params)
+            user_id = user_data["user_id"]
+            access_token = user_data["access_token"]
+            access_token_secret = user_data["access_token_secret"]
+            screen_name = user_data["screen_name"]
             name = user_data["name"]
             avatar_url = user_data["profile_image_url"]
 
+            cookie = sessions.session_operations.set_session(user_id, access_token, access_token_secret, screen_name, name, avatar_url)
+
             self.send_response(200)
             self.send_header("Content-type", "text/html")
+            self.send_header("Set-Cookie", cookie.output(header=""))
             self.end_headers()
 
             html_form = f"""
