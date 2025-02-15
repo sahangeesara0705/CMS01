@@ -13,8 +13,6 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
         query_params = parse_qs(parsed_url.query)
 
         if parsed_url.path == "/login":
-            # github_authentication_url = user_management.github_oauth_handler.get_authorization_url()
-            # x_authentication_url = user_management.x_oauth_handler.get_authorization_url()
             server.serve_html.serve_html_template(self, "cms_templates/login.html", {
                 "github_authentication_url": "/login/github",
                 "x_authentication_url": "/login/x"
@@ -50,7 +48,6 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(html_form.encode("utf-8"))
             return
         elif parsed_url.path == "/x_callback":
-            # access_token = user_management.github_oauth_handler.get_access_token(query_params.get("code", [""])[0])
             user_data = user_management.x_oauth_handler.get_user_data(self, query_params)
             name = user_data["name"]
             avatar_url = user_data["profile_image_url"]
