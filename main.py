@@ -13,13 +13,16 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
         query_params = parse_qs(parsed_url.query)
 
         if parsed_url.path == "/login":
-            github_authentication_url = user_management.github_oauth_handler.get_authorization_url()
+            # github_authentication_url = user_management.github_oauth_handler.get_authorization_url()
             # x_authentication_url = user_management.x_oauth_handler.get_authorization_url()
             server.serve_html.serve_html_template(self, "cms_templates/login.html", {
-                "github_authentication_url": github_authentication_url,
+                "github_authentication_url": "/login/github",
                 "x_authentication_url": "/login/x"
             })
             return
+        elif parsed_url.path == "/login/github":
+            github_authentication_url = user_management.github_oauth_handler.get_authorization_url()
+            self.redirect(github_authentication_url)
         elif parsed_url.path == "/login/x":
             x_authentication_url = user_management.x_oauth_handler.get_authorization_url()
             self.redirect(x_authentication_url)
