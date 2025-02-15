@@ -2,6 +2,7 @@ import http.server
 import os
 import server.serve_html
 import user_management.github_oauth_handler
+import user_management.x_oauth_handler
 from urllib.parse import urlparse, parse_qs, unquote_plus
 
 PORT = 8000
@@ -13,7 +14,11 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
 
         if parsed_url.path == "/login":
             github_authentication_url = user_management.github_oauth_handler.get_authorization_url()
-            server.serve_html.serve_html_template(self, "cms_templates/login.html", {"github_authentication_url": github_authentication_url})
+            x_authentication_url = user_management.x_oauth_handler.get_authorization_url()
+            server.serve_html.serve_html_template(self, "cms_templates/login.html", {
+                "github_authentication_url": github_authentication_url,
+                "x_authentication_url": x_authentication_url
+            })
             return
         elif parsed_url.path == "/callback":
             print("1")
@@ -21,6 +26,30 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             user_data = user_management.github_oauth_handler.get_user_data(access_token)
             name = user_data["name"]
             avatar_url = user_data["avatar_url"]
+
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+
+            html_form = f"""
+            <html>
+                <body onload="document.forms[0].submit()">
+                    <form action="/welcome" method="POST">
+                        <input type="hidden" name="name" value="{name}">
+                        <input type="hidden" name="avatar_url" value="{avatar_url}">
+                    </form>
+                </body>
+            </html>
+            """
+            self.wfile.write(html_form.encode("utf-8"))
+            print("2")
+            return
+        elif parsed_url.path == "/x_callback":
+            print("1")
+            # access_token = user_management.github_oauth_handler.get_access_token(query_params.get("code", [""])[0])
+            user_data = user_management.x_oauth_handler.get_user_data(self, query_params)
+            name = user_data["name"]
+            avatar_url = user_data["profile_image_url"]
 
             self.send_response(200)
             self.send_header("Content-type", "text/html")
