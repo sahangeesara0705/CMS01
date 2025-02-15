@@ -1,12 +1,16 @@
 body {
     margin: 0;
-    font-family: sans_serif
+    font-family: sans-serif;
 }
 header {
     display: flex;
     align-items: center;
     background-color: #eeeeee;
     padding: 10px;
+}
+header .logo {
+    font-family: monospace;
+    font-size: 25px;
 }
 header .user-box {
     margin-left: auto;
@@ -23,4 +27,22 @@ header .user-box img {
 header .user-box .name {
     margin-top: 0;
     margin-bottom: 0;
+}
+
+.login-buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+    margin: 50px auto 0;
+}
+.login-buttons-container a {
+    border: 1px solid #cccccc;
+    padding: 10px;
+    text-decoration: none;
+    color: #000000;
+}
+.login-buttons-container a:hover {
+    color: #0000ff;
+    border: 1px solid #0000ff;
 }
