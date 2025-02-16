@@ -1,4 +1,5 @@
 import http.server
+import json
 import os
 from http.cookies import SimpleCookie
 import server.serve_html
@@ -9,7 +10,19 @@ from urllib.parse import urlparse, parse_qs, unquote_plus
 
 PORT = 8000
 
-class MainHandler(http.server.SimpleHTTPRequestHandler):
+class BaseHandler(http.server.SimpleHTTPRequestHandler):
+    def send_json_response(self, data, status_code=200):
+        self.send_response(status_code)
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode("utf-8"))
+
+    def redirect(self, new_url: str):
+        self.send_response(302)
+        self.send_header("Location", new_url)
+        self.end_headers()
+
+class UserHandler(BaseHandler):
     def do_GET(self):
         parsed_url = urlparse(self.path)
         query_params = parse_qs(parsed_url.query)
@@ -57,13 +70,12 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             name = user_data["name"]
             avatar_url = user_data["avatar_url"]
 
-            cookie = sessions.session_operations.set_session(user_id, access_token, "", screen_name,
-                                                             name, avatar_url)
+            cookie = sessions.session_operations.set_session(user_id, access_token, "", screen_name, name, avatar_url)
 
             self.send_response(302)
             self.send_header("Content-type", "text/html")
             self.send_header("Set-Cookie", cookie.output(header=""))
-            self.send_header("Location", "/welcome")
+            self.send_header("Location", "/cms/welcome")
             self.end_headers()
             return
         elif parsed_url.path == "/user/oauth/x/callback":
@@ -80,10 +92,15 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(302)
             self.send_header("Content-type", "text/html")
             self.send_header("Set-Cookie", cookie.output(header=""))
-            self.send_header("Location", "/welcome")
+            self.send_header("Location", "/cms/welcome")
             self.end_headers()
             return
-        elif parsed_url.path == "/welcome":
+
+class CMSHandler(BaseHandler):
+    def do_GET(self):
+        parsed_url = urlparse(self.path)
+        query_params = parse_qs(parsed_url.query)
+        if parsed_url.path == "/cms/welcome":
             cookie_header = self.headers.get('Cookie')
             session_id = sessions.session_operations.get_session_from_cookies(cookie_header)
             if session_id:
@@ -99,33 +116,38 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header("Location", "/user/login")
                 self.end_headers()
                 return
-        elif parsed_url.path == "/":
-            self.path = "templates/index.html"
-        return super().do_GET()
-
-    def do_POST(self):
-        if self.path == "/welcome":
-            content_length = int(self.headers["Content-Length"])
-            post_data = self.rfile.read(content_length).decode("utf-8")
-
-            parsed_data = parse_qs(post_data)
-            name = parsed_data.get("name", [""])[0]
-            avatar_url = parsed_data.get("avatar_url", [""])[0]
-
-            name = unquote_plus(name)
-            avatar_url = unquote_plus(avatar_url)
-
-            server.serve_html.serve_html_template(self, "cms_templates/welcome.html", {"name": name, "avatar_url": avatar_url})
-
-    def redirect(self, new_url: str):
-        self.send_response(302)
-        self.send_header("Location", new_url)
-        self.end_headers()
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-if __name__ == "__main__":
+class MainRouter:
+    ROUTES = {
+        "/user": UserHandler,
+        "/cms": CMSHandler
+    }
+
+    def get_handler(self, path):
+        for route, handler_class in self.ROUTES.items():
+            if path.startswith(route):
+                return handler_class
+        return None
+
+def run_server():
+    router = MainRouter()
+
+    class RequestDispatcher(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            handler_class = router.get_handler(self.path)
+            if handler_class:
+                self.protocol_version = "HTTP/1.1"
+                self.__class__ = handler_class
+                handler_class.do_GET(self)
+            else:
+                self.send_error(404, "Route not found")
+
     server_address = ("", PORT)
-    httpd = http.server.HTTPServer(server_address, MainHandler)
-    print(f"Serving on port: {PORT}...")
+    httpd = http.server.HTTPServer(server_address, RequestDispatcher)
+    print("Server running on port 8000...")
     httpd.serve_forever()
+
+if __name__ == "__main__":
+    run_server()
