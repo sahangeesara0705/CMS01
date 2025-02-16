@@ -1,7 +1,6 @@
 import http.server
 import os
 from http.cookies import SimpleCookie
-
 import server.serve_html
 import user_management.github_oauth_handler
 import user_management.x_oauth_handler
@@ -53,24 +52,35 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
         elif parsed_url.path == "/user/oauth/github/callback":
             access_token = user_management.github_oauth_handler.get_access_token(query_params.get("code", [""])[0])
             user_data = user_management.github_oauth_handler.get_user_data(access_token)
+            user_id = user_data["id"]
+            screen_name = user_data["login"]
             name = user_data["name"]
             avatar_url = user_data["avatar_url"]
 
-            self.send_response(200)
+            cookie = sessions.session_operations.set_session(user_id, access_token, "", screen_name,
+                                                             name, avatar_url)
+
+            self.send_response(302)
             self.send_header("Content-type", "text/html")
+            self.send_header("Set-Cookie", cookie.output(header=""))
+            self.send_header("Location", "/welcome")
             self.end_headers()
 
-            html_form = f"""
-            <html>
-                <body onload="document.forms[0].submit()">
-                    <form action="/welcome" method="POST">
-                        <input type="hidden" name="name" value="{name}">
-                        <input type="hidden" name="avatar_url" value="{avatar_url}">
-                    </form>
-                </body>
-            </html>
-            """
-            self.wfile.write(html_form.encode("utf-8"))
+            # self.send_response(200)
+            # self.send_header("Content-type", "text/html")
+            # self.end_headers()
+            #
+            # html_form = f"""
+            # <html>
+            #     <body onload="document.forms[0].submit()">
+            #         <form action="/welcome" method="POST">
+            #             <input type="hidden" name="name" value="{name}">
+            #             <input type="hidden" name="avatar_url" value="{avatar_url}">
+            #         </form>
+            #     </body>
+            # </html>
+            # """
+            # self.wfile.write(html_form.encode("utf-8"))
             return
         elif parsed_url.path == "/user/oauth/x/callback":
             user_data = user_management.x_oauth_handler.get_user_data(self, query_params)
