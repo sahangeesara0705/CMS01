@@ -3,9 +3,9 @@ from http.client import responses
 import requests
 from urllib.parse import urlencode
 
-CLIENT_ID = "Ov23liRXN4hsPQ7WwhKL"
-CLIENT_SECRET = "36af13f05b52ba2251271e5a573e87255c2f7979"
-REDIRECT_URI = "http://localhost:8000/callback"
+CLIENT_ID = "Ov23liSl5iahr1bG3o4n"
+CLIENT_SECRET = "ca7c14fa6074974275e927727024e07e1a9c0f13"
+REDIRECT_URI = "http://localhost:8000/user/oauth/github/callback"
 
 # Redirect the user to GitHub's authorization page
 def get_authorization_url():

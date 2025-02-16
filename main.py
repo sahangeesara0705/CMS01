@@ -15,7 +15,7 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
         parsed_url = urlparse(self.path)
         query_params = parse_qs(parsed_url.query)
 
-        if parsed_url.path == "/login":
+        if parsed_url.path == "/user/login":
             cookie_header = self.headers.get('Cookie')
             session_id = sessions.session_operations.get_session_from_cookies(cookie_header)
             if session_id:
@@ -27,11 +27,11 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
                     self.end_headers()
             else:
                 server.serve_html.serve_html_template(self, "cms_templates/login.html", {
-                    "github_authentication_url": "/login/github",
-                    "x_authentication_url": "/login/x"
+                    "github_authentication_url": "/user/login/github",
+                    "x_authentication_url": "/user/login/x"
                 })
             return
-        if parsed_url.path == "/logout":
+        if parsed_url.path == "/user/logout":
             cookie = SimpleCookie()
             cookie["session_id"] = ""
             cookie["session_id"]["path"] = "/"
@@ -39,18 +39,18 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(303)
             self.send_header("Content-type", "text/html")
             self.send_header("Set-Cookie", cookie.output(header=""))
-            self.send_header("Location", "/login")
+            self.send_header("Location", "/user/login")
             self.end_headers()
             return
-        elif parsed_url.path == "/login/github":
+        elif parsed_url.path == "/user/login/github":
             github_authentication_url = user_management.github_oauth_handler.get_authorization_url()
             self.redirect(github_authentication_url)
             return
-        elif parsed_url.path == "/login/x":
+        elif parsed_url.path == "/user/login/x":
             x_authentication_url = user_management.x_oauth_handler.get_authorization_url()
             self.redirect(x_authentication_url)
             return
-        elif parsed_url.path == "/callback":
+        elif parsed_url.path == "/user/oauth/github/callback":
             access_token = user_management.github_oauth_handler.get_access_token(query_params.get("code", [""])[0])
             user_data = user_management.github_oauth_handler.get_user_data(access_token)
             name = user_data["name"]
@@ -72,7 +72,7 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             """
             self.wfile.write(html_form.encode("utf-8"))
             return
-        elif parsed_url.path == "/x_callback":
+        elif parsed_url.path == "/user/oauth/x/callback":
             user_data = user_management.x_oauth_handler.get_user_data(self, query_params)
             user_id = user_data["user_id"]
             access_token = user_data["access_token"]
@@ -114,7 +114,7 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             else:
                 self.send_response(302)
                 self.send_header("Content-type", "text/html")
-                self.send_header("Location", "/login")
+                self.send_header("Location", "/user/login")
                 self.end_headers()
                 return
 
