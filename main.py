@@ -99,9 +99,6 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header("Location", "/user/login")
                 self.end_headers()
                 return
-
-
-
         elif parsed_url.path == "/":
             self.path = "templates/index.html"
         return super().do_GET()
