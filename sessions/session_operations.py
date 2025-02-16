@@ -1,5 +1,4 @@
 import psycopg2
-import os
 from http.cookies import SimpleCookie
 
 DB_NAME = "postgres"
@@ -66,7 +65,7 @@ def set_session(user_id, access_token, access_token_secret, screen_name, name, p
 def get_session(user_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM sessions WHERE user_id = %s", {user_id})
+    cur.execute("SELECT * FROM sessions WHERE user_id = %s", (user_id,))
     session = cur.fetchone()
     cur.close()
     conn.close()

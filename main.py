@@ -1,5 +1,7 @@
 import http.server
 import os
+from http.cookies import SimpleCookie
+
 import server.serve_html
 import user_management.github_oauth_handler
 import user_management.x_oauth_handler
@@ -14,10 +16,31 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
         query_params = parse_qs(parsed_url.query)
 
         if parsed_url.path == "/login":
-            server.serve_html.serve_html_template(self, "cms_templates/login.html", {
-                "github_authentication_url": "/login/github",
-                "x_authentication_url": "/login/x"
-            })
+            cookie_header = self.headers.get('Cookie')
+            session_id = sessions.session_operations.get_session_from_cookies(cookie_header)
+            if session_id:
+                session_data = sessions.session_operations.get_session(session_id)
+                if session_data:
+                    self.send_response(302)
+                    self.send_header("Content-type", "text/html")
+                    self.send_header("Location", "/welcome")
+                    self.end_headers()
+            else:
+                server.serve_html.serve_html_template(self, "cms_templates/login.html", {
+                    "github_authentication_url": "/login/github",
+                    "x_authentication_url": "/login/x"
+                })
+            return
+        if parsed_url.path == "/logout":
+            cookie = SimpleCookie()
+            cookie["session_id"] = ""
+            cookie["session_id"]["path"] = "/"
+            cookie["session_id"]["httponly"] = True
+            self.send_response(303)
+            self.send_header("Content-type", "text/html")
+            self.send_header("Set-Cookie", cookie.output(header=""))
+            self.send_header("Location", "/login")
+            self.end_headers()
             return
         elif parsed_url.path == "/login/github":
             github_authentication_url = user_management.github_oauth_handler.get_authorization_url()
@@ -60,23 +83,43 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
 
             cookie = sessions.session_operations.set_session(user_id, access_token, access_token_secret, screen_name, name, avatar_url)
 
-            self.send_response(200)
+            self.send_response(302)
             self.send_header("Content-type", "text/html")
             self.send_header("Set-Cookie", cookie.output(header=""))
+            self.send_header("Location", "/welcome")
             self.end_headers()
 
-            html_form = f"""
-            <html>
-                <body onload="document.forms[0].submit()">
-                    <form action="/welcome" method="POST">
-                        <input type="hidden" name="name" value="{name}">
-                        <input type="hidden" name="avatar_url" value="{avatar_url}">
-                    </form>
-                </body>
-            </html>
-            """
-            self.wfile.write(html_form.encode("utf-8"))
+            # html_form = f"""
+            # <html>
+            #     <body onload="document.forms[0].submit()">
+            #         <form action="/welcome" method="GET">
+            #             <input type="hidden" name="name" value="{name}">
+            #             <input type="hidden" name="avatar_url" value="{avatar_url}">
+            #         </form>
+            #     </body>
+            # </html>
+            # """
+            # self.wfile.write(html_form.encode("utf-8"))
             return
+        elif parsed_url.path == "/welcome":
+            cookie_header = self.headers.get('Cookie')
+            session_id = sessions.session_operations.get_session_from_cookies(cookie_header)
+            if session_id:
+                session_data = sessions.session_operations.get_session(session_id)
+                name = session_data[5]
+                avatar_url = session_data[6]
+                server.serve_html.serve_html_template(self, "cms_templates/welcome.html",
+                                                      {"name": name, "avatar_url": avatar_url})
+                return
+            else:
+                self.send_response(302)
+                self.send_header("Content-type", "text/html")
+                self.send_header("Location", "/login")
+                self.end_headers()
+                return
+
+
+
         elif parsed_url.path == "/":
             self.path = "templates/index.html"
         return super().do_GET()
