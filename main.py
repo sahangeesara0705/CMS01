@@ -65,22 +65,6 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Set-Cookie", cookie.output(header=""))
             self.send_header("Location", "/welcome")
             self.end_headers()
-
-            # self.send_response(200)
-            # self.send_header("Content-type", "text/html")
-            # self.end_headers()
-            #
-            # html_form = f"""
-            # <html>
-            #     <body onload="document.forms[0].submit()">
-            #         <form action="/welcome" method="POST">
-            #             <input type="hidden" name="name" value="{name}">
-            #             <input type="hidden" name="avatar_url" value="{avatar_url}">
-            #         </form>
-            #     </body>
-            # </html>
-            # """
-            # self.wfile.write(html_form.encode("utf-8"))
             return
         elif parsed_url.path == "/user/oauth/x/callback":
             user_data = user_management.x_oauth_handler.get_user_data(self, query_params)
@@ -98,18 +82,6 @@ class MainHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Set-Cookie", cookie.output(header=""))
             self.send_header("Location", "/welcome")
             self.end_headers()
-
-            # html_form = f"""
-            # <html>
-            #     <body onload="document.forms[0].submit()">
-            #         <form action="/welcome" method="GET">
-            #             <input type="hidden" name="name" value="{name}">
-            #             <input type="hidden" name="avatar_url" value="{avatar_url}">
-            #         </form>
-            #     </body>
-            # </html>
-            # """
-            # self.wfile.write(html_form.encode("utf-8"))
             return
         elif parsed_url.path == "/welcome":
             cookie_header = self.headers.get('Cookie')
