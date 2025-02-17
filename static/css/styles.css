@@ -46,3 +46,15 @@ header .user-box .name {
     color: #0000ff;
     border: 1px solid #0000ff;
 }
+
+.logout-button {
+    border: 1px solid #aaaaaa;
+    padding: 5px 10px;
+    margin-left: 10px;
+    color: #000000;
+    text-decoration: none;
+}
+.logout-button:hover {
+    color: #0000ff;
+    text-decoration: none;
+}
