@@ -1,5 +1,8 @@
 import psycopg2
+import os
+import uuid
 from http.cookies import SimpleCookie
+from http.server import BaseHTTPRequestHandler
 
 DB_NAME = "postgres"
 DB_USER = "postgres"
@@ -20,55 +23,119 @@ def setup_database():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
-        CREATE TABLE IF NOT EXISTS sessions (
+        CREATE TABLE IF NOT EXISTS "User" (
             id SERIAL PRIMARY KEY,
             user_id TEXT UNIQUE NOT NULL,
-            access_token TEXT NOT NULL,
-            access_token_secret TEXT NOT NULL,
-            screen_name TEXT NOT NULL,
             name TEXT NOT NULL,
-            profile_image_url TEXT NOT NULL
-        )
+            profile_image_url TEXT,
+            sign_in_type TEXT NOT NULL,
+            access_token TEXT NOT NULL,
+            access_token_secret TEXT
+        );
+    ''')
+
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS Session (
+            id SERIAL PRIMARY KEY,
+            session_id UUID DEFAULT gen_random_uuid() UNIQUE NOT NULL,
+            user_id INTEGER REFERENCES "User"(id) ON DELETE CASCADE,
+            ip_address TEXT,
+            fingerprint_hash TEXT
+        );
     ''')
     conn.commit()
     cur.close()
     conn.close()
 
 def get_session_from_cookies(cookie_header):
-    cookie = SimpleCookie()
-    cookie.load(cookie_header)
-    return cookie.get("session_id").value if "session_id" in cookie else None
+    if cookie_header:
+        cookie = SimpleCookie()
+        cookie.load(cookie_header)
+        return cookie.get("session_id").value if "session_id" in cookie else None
+    else:
+        return None
 
-def set_session(user_id, access_token, access_token_secret, screen_name, name, profile_image_url):
+def set_session(user_id, ip_address, fingerprint_hash):
+    session_id = str(uuid.uuid4())
+
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
-        INSERT INTO sessions (user_id, access_token, access_token_secret, screen_name, name, profile_image_url)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        ON CONFLICT (user_id) DO UPDATE SET
-        access_token = EXCLUDED.access_token,
-        access_token_secret = EXCLUDED.access_token_secret,
-        screen_name = EXCLUDED.screen_name,
-        name = EXCLUDED.name,
-        profile_image_url = EXCLUDED.profile_image_url;
-    ''', (user_id, access_token, access_token_secret, screen_name, name, profile_image_url))
+        INSERT INTO Session (session_id, user_id, ip_address, fingerprint_hash)
+        VALUES (%s, %s, %s, %s)
+        ON CONFLICT (session_id) DO UPDATE SET
+        ip_address = EXCLUDED.ip_address,
+        fingerprint_hash = EXCLUDED.fingerprint_hash;
+    ''', (session_id, user_id, ip_address, fingerprint_hash))
     conn.commit()
     cur.close()
     conn.close()
 
     cookie = SimpleCookie()
-    cookie["session_id"] = user_id
+    cookie["session_id"] = session_id
     cookie["session_id"]["path"] = "/"
     cookie["session_id"]["httponly"] = True
     return cookie
 
-def get_session(user_id):
+def set_user(user_id, name, profile_image_url, sign_in_type, access_token, access_token_secret):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM sessions WHERE user_id = %s", (user_id,))
+    cur.execute('''
+        INSERT INTO "User" (user_id, name, profile_image_url, sign_in_type, access_token, access_token_secret)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (user_id) DO UPDATE SET
+        name = EXCLUDED.name,
+        profile_image_url = EXCLUDED.profile_image_url,
+        sign_in_type = EXCLUDED.sign_in_type,
+        access_token = EXCLUDED.access_token,
+        access_token_secret = EXCLUDED.access_token_secret;
+    ''', (user_id, name, profile_image_url, sign_in_type, access_token, access_token_secret))
+
+    # cur.execute('''
+    #         INSERT INTO "User" (user_id, name, profile_image_url, sign_in_type, access_token, access_token_secret)
+    #         VALUES (%s, %s, %s, %s, %s, %s)
+    #     ''', (user_id, name, profile_image_url, sign_in_type, access_token, access_token_secret))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    cookie = SimpleCookie()
+    cookie["sign_in_type"] = sign_in_type
+    cookie["sign_in_type"]["path"] = "/"
+    cookie["sign_in_type"]["httponly"] = True
+    return cookie
+
+def get_session(session_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM Session WHERE session_id = %s", (session_id,))
     session = cur.fetchone()
     cur.close()
     conn.close()
     return session
+
+def get_user_by_session_id(session_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT "User".* FROM "User"
+        JOIN Session ON "User".id = Session.user_id
+        WHERE Session.session_id = %s
+    ''', (session_id,))
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+    return user
+
+def get_user_by_user_id(user_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT * FROM "User" WHERE user_id = %s
+    ''', (str(user_id),))
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+    return user
 
 setup_database()

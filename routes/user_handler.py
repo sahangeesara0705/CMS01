@@ -15,8 +15,8 @@ class UserHandler(BaseHandler):
             cookie_header = self.headers.get('Cookie')
             session_id = sessions.session_operations.get_session_from_cookies(cookie_header)
             if session_id:
-                session_data = sessions.session_operations.get_session(session_id)
-                if session_data:
+                user_data = sessions.session_operations.get_session(session_id)
+                if user_data:
                     self.send_response(302)
                     self.send_header("Content-type", "text/html")
                     self.send_header("Location", "/cms/welcome")
@@ -53,12 +53,16 @@ class UserHandler(BaseHandler):
             screen_name = user_data["login"]
             name = user_data["name"]
             avatar_url = user_data["avatar_url"]
+            user_unique_id = sessions.session_operations.get_user_by_user_id(user_id)[0]
 
-            cookie = sessions.session_operations.set_session(user_id, access_token, "", screen_name, name, avatar_url)
+            # cookie = sessions.session_operations.set_session(user_id, access_token, "", screen_name, name, avatar_url)
+            user_type_cookie = sessions.session_operations.set_user(user_id, name, avatar_url, "GitHub", access_token, "")
+            session_cookie = sessions.session_operations.set_session(user_unique_id, "", "")
 
             self.send_response(302)
             self.send_header("Content-type", "text/html")
-            self.send_header("Set-Cookie", cookie.output(header=""))
+            self.send_header("Set-Cookie", session_cookie.output(header=""))
+            self.send_header("Set-Cookie", user_type_cookie.output(header=""))
             self.send_header("Location", "/cms/welcome")
             self.end_headers()
             return
@@ -70,12 +74,16 @@ class UserHandler(BaseHandler):
             screen_name = user_data["screen_name"]
             name = user_data["name"]
             avatar_url = user_data["profile_image_url"]
+            user_unique_id = sessions.session_operations.get_user_by_user_id(user_id)[0]
 
-            cookie = sessions.session_operations.set_session(user_id, access_token, access_token_secret, screen_name, name, avatar_url)
+            # cookie = sessions.session_operations.set_session(user_id, access_token, access_token_secret, screen_name, name, avatar_url)
+            user_type_cookie = sessions.session_operations.set_user(user_id, name, avatar_url, "X", access_token, access_token_secret)
+            session_cookie = sessions.session_operations.set_session(user_unique_id, "", "")
 
             self.send_response(302)
             self.send_header("Content-type", "text/html")
-            self.send_header("Set-Cookie", cookie.output(header=""))
+            self.send_header("Set-Cookie", session_cookie.output(header=""))
+            self.send_header("Set-Cookie", user_type_cookie.output(header=""))
             self.send_header("Location", "/cms/welcome")
             self.end_headers()
             return
