@@ -1,26 +1,11 @@
+import html
 import re
 import os
 from urllib.parse import urlparse, parse_qs
-import sessions.session_operations
 import server.serve_html
 from routes.base_handler import BaseHandler
 
 class CMSHandler(BaseHandler):
-    def _get_authenticated_user(self):
-        """Retrieve user data from session or redirect if unauthorized."""
-        cookie_header = self.headers.get('Cookie')
-        session_id = sessions.session_operations.get_session_from_cookies(cookie_header)
-
-        if session_id:
-            user_data = sessions.session_operations.get_user_by_session_id(session_id)
-            return user_data[2], user_data[3]
-
-        self.send_response(302)
-        self.send_header("Content-type", "text/html")
-        self.send_header("Location", "/user/login")
-        self.end_headers()
-        return None, None
-
     def do_GET(self):
         parsed_url = urlparse(self.path)
         query_params = parse_qs(parsed_url.query)
@@ -46,21 +31,27 @@ class CMSHandler(BaseHandler):
                 if os.path.exists(page_path):
                     with open(page_path, "r", encoding="utf-8") as file:
                         page_content = file.read()
+
+                    page_content = "\n".join(page_content.splitlines()).strip()
+                    encoded_html = html.escape(page_content)
+
                     server.serve_html.serve_html_template(self, "cms_templates/edit/edit_page.html", {
                         "page_name": page_name,
                         "name": name,
                         "avatar_url": avatar_url,
-                        "page_content": page_content,
+                        "page_content": encoded_html,
                         "edit_path": f"/cms/edit/{page_name}.html"
                     })
                 else:
                     self.send_response(404, f"Page {page_name} not found")
             return
 
+        error_message = b"<html><body><h1>404 Not Found</h1><p>Page not found.</p></body></html>"
         self.send_response(404)
         self.send_header("Content-type", "text/html")
+        self.send_header("Content-Length", str(len(error_message)))
         self.end_headers()
-        self.wfile.write(b"Page not found")
+        self.wfile.write(error_message)
 
     def do_POST(self):
         parsed_url = urlparse(self.path)
@@ -83,22 +74,13 @@ class CMSHandler(BaseHandler):
                         html_code = form["html_code"][0]
 
                         with open(page_path, "w", encoding="utf-8", newline="\n") as file:
-                            file.write(html_code.replace("\r\n", "\n"))
+                            normalized_html = "\n".join(html_code.splitlines()).strip()
+                            decoded_html = html.unescape(normalized_html)
+                            file.write(decoded_html)
 
-                        server.serve_html.serve_html_template(self, "cms_templates/edit/edit_page.html", {
-                            "page_name": page_name,
-                            "name": name,
-                            "avatar_url": avatar_url,
-                            "page_content": html_code,
-                            "edit_path": f"/cms/edit/{page_name}.html"
-                        })
+                        self.redirect(f"/cms/edit/{page_name}.html")
 
                         return
-
-                        self.send_response(200)
-                        self.send_header("Content-Type", "application/json")
-                        self.end_headers()
-                        self.wfile.write(b'{"status": "success", "message": "Page updated successfully"}')
                     else:
                         self.send_error(400, "Invalid request: Missing 'html_code'")
                 else:

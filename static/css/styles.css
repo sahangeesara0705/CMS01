@@ -58,3 +58,57 @@ header .user-box .name {
     color: #0000ff;
     text-decoration: none;
 }
+
+.content-area {
+    padding: 10px;
+}
+.content-area h1 {
+    text-align: center;
+}
+
+.toolbar-1 {
+    background-color: #dbdbdb;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+}
+.toolbar-1 a {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #000000;
+    border: 1px solid #888888;
+    padding: 5px 10px;
+    text-decoration: none;
+}
+.toolbar-1 a:hover {
+    color: #0000ff;
+    border: 1px solid #0000ff;
+}
+.toolbar-2 {
+    background-color: #0049a3;
+    color: #ffffff;
+    padding: 5px 10px;
+}
+.toolbar-2 a,
+.toolbar-2 span {
+    color: #ffffff;
+}
+.edit-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.edit-form .text-editor {
+    width: calc(100% - 6px);
+    height: calc(100vh - 250px)
+}
+.edit-form .submit-button {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border: 1px solid #aaaaaa;
+    margin-left: auto;
+}
+.edit-form .submit-button:hover {
+    color: #0000ff;
+    border: 1px solid #0000ff;
+}
