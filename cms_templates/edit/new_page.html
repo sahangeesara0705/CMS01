@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <title>New page</title>
+</head>
+<body>
+<header>
+    <div class="logo">CMS01</div>
+    <div class="user-box">
+        <img src="{{avatar_url}}" alt="abc" srcset="">
+        <p class="name">{{name}}</p>
+    </div>
+    <a class="logout-button" href="/user/logout">Logout</a>
+</header>
+<div class="toolbar-1">
+    <a href="/cms/edit/index.html">Edit</a>
+    <a href="#">File Manager</a>
+</div>
+<div class="toolbar-2">
+    <a href="#">Home</a>
+    <span class="seperator">/</span>
+    <a href="#">New page</a>
+</div>
+<div class="content-area">
+    <form class="edit-form" action="/cms/edit/new_page" method="post">
+        <input type="text" placeholder="page_name" name="page_name">
+        <button class="submit-button" type="submit">Create</button>
+    </form>
+</div>
+</body>
+</html>
