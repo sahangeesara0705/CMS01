@@ -33,6 +33,16 @@ class RequestDispatcher(http.server.SimpleHTTPRequestHandler):
         else:
             self.send_error(404, "Route not found")
 
+    def do_POST(self):
+        router = MainRouter()
+        handler_class = router.get_handler(self.path)
+        if handler_class:
+            self.protocol_version = "HTTP/1.1"
+            self.__class__ = handler_class
+            handler_class.do_POST(self)
+        else:
+            self.send_error(405, "Method Not Allowed")
+
 def run_server():
     server_address = ("", PORT)
     httpd = http.server.HTTPServer(server_address, RequestDispatcher)
