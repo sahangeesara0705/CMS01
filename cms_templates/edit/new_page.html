@@ -17,20 +17,24 @@
     </div>
     <a class="logout-button" href="/user/logout">Logout</a>
 </header>
-<div class="toolbar-1">
-    <a href="/cms/edit/index.html">Edit</a>
-    <a href="#">File Manager</a>
-</div>
-<div class="toolbar-2">
-    <a href="#">Home</a>
-    <span class="seperator">/</span>
-    <a href="#">New page</a>
-</div>
-<div class="content-area">
-    <form class="edit-form" action="/cms/edit/new_page" method="post">
-        <input type="text" placeholder="page_name" name="page_name">
-        <button class="submit-button" type="submit">Create</button>
-    </form>
+<div class="cms-wrapper-1">
+    <div class="toolbar-1">
+        <a href="/cms/edit/index.html">Edit</a>
+        <a href="#">File Manager</a>
+    </div>
+    <div class="cms-wrapper-2">
+        <div class="toolbar-2">
+            <a href="#">Home</a>
+            <span class="seperator">/</span>
+            <a href="#">New page</a>
+        </div>
+        <div class="content-area">
+            <form class="edit-form" action="/cms/edit/new_page" method="post">
+                <input type="text" placeholder="page_name" name="page_name">
+                <button class="submit-button" type="submit">Create</button>
+            </form>
+        </div>
+    </div>
 </div>
 </body>
 </html>

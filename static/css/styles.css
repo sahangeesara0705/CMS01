@@ -66,9 +66,18 @@ header .user-box .name {
     text-align: center;
 }
 
+.cms-wrapper-1 {
+    display: flex;
+    height: calc(100vh - 52px);
+}
+.cms-wrapper-2 {
+    flex: 1;
+}
 .toolbar-1 {
     background-color: #dbdbdb;
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     gap: 10px;
     padding: 10px;
 }

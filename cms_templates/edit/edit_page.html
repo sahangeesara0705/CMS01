@@ -17,20 +17,24 @@
     </div>
     <a class="logout-button" href="/user/logout">Logout</a>
 </header>
-<div class="toolbar-1">
-    <a href="/cms/edit/index.html">Edit</a>
-    <a href="#">File Manager</a>
-</div>
-<div class="toolbar-2">
-    <a href="#">Home</a>
-    <span class="seperator">/</span>
-    <a href="#">{{page_name}}.html</a>
-</div>
-<div class="content-area">
-    <form class="edit-form" action="{{edit_path}}" method="post">
-        <textarea class="text-editor" name="html_code">{{page_content}}</textarea>
-        <button class="submit-button" type="submit">Save</button>
-    </form>
+<div class="cms-wrapper-1">
+    <div class="toolbar-1">
+        <a href="/cms/edit/index.html">Edit</a>
+        <a href="#">File Manager</a>
+    </div>
+    <div class="cms-wrapper-2">
+        <div class="toolbar-2">
+            <a href="#">Home</a>
+            <span class="seperator">/</span>
+            <a href="#">{{page_name}}.html</a>
+        </div>
+        <div class="content-area">
+            <form class="edit-form" action="{{edit_path}}" method="post">
+                <textarea class="text-editor" name="html_code">{{page_content}}</textarea>
+                <button class="submit-button" type="submit">Save</button>
+            </form>
+        </div>
+    </div>
 </div>
 </body>
 </html>
