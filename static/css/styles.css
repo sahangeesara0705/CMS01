@@ -46,3 +46,102 @@ header .user-box .name {
     color: #0000ff;
     border: 1px solid #0000ff;
 }
+
+.logout-button {
+    border: 1px solid #aaaaaa;
+    padding: 5px 10px;
+    margin-left: 10px;
+    color: #000000;
+    text-decoration: none;
+}
+.logout-button:hover {
+    color: #0000ff;
+    text-decoration: none;
+}
+
+.content-area {
+    padding: 10px;
+}
+.content-area h1 {
+    text-align: center;
+}
+
+.cms-wrapper-1 {
+    display: flex;
+    height: calc(100vh - 52px);
+}
+.cms-wrapper-2 {
+    flex: 1;
+}
+.toolbar-1 {
+    background-color: #dbdbdb;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    /*padding: 10px;*/
+}
+.toolbar-1-main-item-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.toolbar-1-page-list {
+    background-color: #eeeeee;
+}
+.toolbar-1 a {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #000000;
+    border: 1px solid #888888;
+    padding: 5px 10px;
+    text-decoration: none;
+}
+.toolbar-1 a:hover {
+    color: #0000ff;
+    border: 1px solid #0000ff;
+}
+.toolbar-2 {
+    background-color: #0049a3;
+    color: #ffffff;
+    padding: 5px 10px;
+}
+.toolbar-2 a,
+.toolbar-2 span {
+    color: #ffffff;
+}
+.edit-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.edit-form .text-editor {
+    width: calc(100% - 6px);
+    height: calc(100vh - 250px)
+}
+.edit-form .submit-button {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border: 1px solid #aaaaaa;
+    margin-left: auto;
+}
+.edit-form .submit-button:hover {
+    color: #0000ff;
+    border: 1px solid #0000ff;
+}
+
+.page-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 0;
+}
+.page-list a {
+    display: block;
+    border: none;
+    background-color: #2b7cdf;
+    color: #ffffff;
+}
+.page-list a:hover {
+    background-color: #2bcdff;
+    color: #ffffff;
+    border: none;
+}

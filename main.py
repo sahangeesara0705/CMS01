@@ -2,6 +2,7 @@ import http.server
 import os
 from routes.user_handler import UserHandler
 from routes.cms_handler import CMSHandler
+from routes.api_cms_handler import APICMSHandler
 
 PORT = 8000
 
@@ -10,7 +11,8 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 class MainRouter:
     ROUTES = {
         "/user": UserHandler,
-        "/cms": CMSHandler
+        "/cms": CMSHandler,
+        "/api/cms": APICMSHandler
     }
 
     def get_handler(self, path):
@@ -32,6 +34,16 @@ class RequestDispatcher(http.server.SimpleHTTPRequestHandler):
             return http.server.SimpleHTTPRequestHandler.do_GET(self)
         else:
             self.send_error(404, "Route not found")
+
+    def do_POST(self):
+        router = MainRouter()
+        handler_class = router.get_handler(self.path)
+        if handler_class:
+            self.protocol_version = "HTTP/1.1"
+            self.__class__ = handler_class
+            handler_class.do_POST(self)
+        else:
+            self.send_error(405, "Method Not Allowed")
 
 def run_server():
     server_address = ("", PORT)
