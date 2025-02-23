@@ -8,7 +8,7 @@ class APICMSHandler(BaseHandler):
     def do_GET(self):
         parsed_url = urlparse(self.path)
         if parsed_url.path == "/api/cms/welcome":
-            name, avatar_url = self._get_authenticated_user() # TODO - need to change to cms
+            name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
             if name:
                 self.send_json_response({
                     "success": True,
@@ -18,7 +18,7 @@ class APICMSHandler(BaseHandler):
                 }, 200)
             return
         elif parsed_url.path == "/api/cms/list_pages":
-            name, avatar_url = self._get_authenticated_user() # TODO - need to change to cms
+            name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
 
             if name:
                 pages_directory = "pages"
