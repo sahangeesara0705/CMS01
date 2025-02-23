@@ -95,7 +95,7 @@ class APICMSHandler(BaseHandler):
         edit_match = re.match(r"^/api/cms/edit/([\w-]+)\.html", parsed_url.path)
         if edit_match:
             page_name = edit_match.group(1)
-            name, avatar_url = self._get_authenticated_user()
+            name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
 
             if name:
                 page_path = f"pages/{page_name}.html"
@@ -144,7 +144,7 @@ class APICMSHandler(BaseHandler):
         delete_match = re.match(r"^/api/cms/delete/([\w-]+)\.html$", parsed_url.path)
         if delete_match:
             page_name = delete_match.group(1)
-            name, avatar_url = self._get_authenticated_user()
+            name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
 
             if name:
                 page_path = f"pages/{page_name}.html"
