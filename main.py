@@ -45,6 +45,16 @@ class RequestDispatcher(http.server.SimpleHTTPRequestHandler):
         else:
             self.send_error(405, "Method Not Allowed")
 
+    def do_DELETE(self):
+        router = MainRouter()
+        handler_class = router.get_handler(self.path)
+        if handler_class and hasattr(handler_class, "do_DELETE"):
+            self.protocol_version = "HTTP/1.1"
+            self.__class__ = handler_class
+            handler_class.do_DELETE(self)
+        else:
+            self.send_error(405, "Method Not Allowed")
+
 def run_server():
     server_address = ("", PORT)
     httpd = http.server.HTTPServer(server_address, RequestDispatcher)

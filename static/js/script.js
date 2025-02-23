@@ -18,7 +18,7 @@ function fetchPages() {
                     let listItem = document.createElement("li");
                     let link = document.createElement("a");
                     link.href = `/cms/edit/${page}`;
-                    link.textContent = page.replace(".html", "");
+                    link.textContent = page.replace("", "");
                     listItem.appendChild(link);
                     pageList.appendChild(listItem);
                 });
