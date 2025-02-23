@@ -76,10 +76,17 @@ header .user-box .name {
 .toolbar-1 {
     background-color: #dbdbdb;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     gap: 10px;
-    padding: 10px;
+    /*padding: 10px;*/
+}
+.toolbar-1-main-item-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.toolbar-1-page-list {
+    background-color: #eeeeee;
 }
 .toolbar-1 a {
     font-family: monospace;
@@ -120,4 +127,21 @@ header .user-box .name {
 .edit-form .submit-button:hover {
     color: #0000ff;
     border: 1px solid #0000ff;
+}
+
+.page-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 0;
+}
+.page-list a {
+    display: block;
+    border: none;
+    background-color: #2b7cdf;
+    color: #ffffff;
+}
+.page-list a:hover {
+    background-color: #2bcdff;
+    color: #ffffff;
+    border: none;
 }

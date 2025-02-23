@@ -2,6 +2,7 @@ import http.server
 import os
 from routes.user_handler import UserHandler
 from routes.cms_handler import CMSHandler
+from routes.api_cms_handler import APICMSHandler
 
 PORT = 8000
 
@@ -10,7 +11,8 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 class MainRouter:
     ROUTES = {
         "/user": UserHandler,
-        "/cms": CMSHandler
+        "/cms": CMSHandler,
+        "/api/cms": APICMSHandler
     }
 
     def get_handler(self, path):
