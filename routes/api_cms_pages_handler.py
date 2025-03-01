@@ -31,7 +31,7 @@ class APICMSPagesHandler(BaseHandler):
         edit_match = re.match(r"^/api/cms/pages/get/([\w-]+)\.html$", parsed_url.path)
         if edit_match:
             page_name = edit_match.group(1)
-            name, avatar_url = self._get_authenticated_user()
+            name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
             if name:
                 page_path = f"pages/{page_name}.html"
                 if os.path.exists(page_path):
@@ -116,6 +116,9 @@ class APICMSPagesHandler(BaseHandler):
                     }, 409)
                 return
 
+
+
+        # update a page
         edit_match = re.match(r"^/api/cms/pages/update/([\w-]+)\.html", parsed_url.path)
         if edit_match:
             page_name = edit_match.group(1)
@@ -163,6 +166,9 @@ class APICMSPagesHandler(BaseHandler):
                 "message": "Page not found"
             }, 404)
 
+
+
+    # delete a page
     def do_DELETE(self):
         parsed_url = urlparse(self.path)
         delete_match = re.match(r"^/api/cms/pages/delete/([\w-]+)\.html$", parsed_url.path)
