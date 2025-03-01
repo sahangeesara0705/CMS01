@@ -4,6 +4,7 @@ from routes.user_handler import UserHandler
 from routes.cms_handler import CMSHandler
 from routes.api_cms_handler import APICMSHandler
 from routes.api_cms_pages_handler import APICMSPagesHandler
+from routes.api_cms_files_handler import APICMSFilesHandler
 
 PORT = 8000
 
@@ -31,6 +32,7 @@ class MainRouter:
         "/user": UserHandler,
         "/cms": CMSHandler,
         "/api/cms/pages": APICMSPagesHandler,
+        "/api/cms/files": APICMSFilesHandler,
         "/api/cms": APICMSHandler
     }
 
