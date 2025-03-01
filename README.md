@@ -4,8 +4,12 @@ A Content Management System written in Python, HTML, CSS and JavaScript
 ## CMS API
 `GET - /api/cms/welcome` get welcome message
 
-## Page API
-`GET - /api/cms/list_pages` get pages list\
-`POST - /api/cms/edit/new_page` create a new page\
-`POST - /api/cms/edit/{page_name}.html` edit content of a page\
-`DELETE - /api/cms/delete/{page_name}.html` delete a page\
+## Page Management
+### `GET - /api/cms/pages/list` list all available pages
+### `GET - /api/cms/pages/get/{page_name}.html` get page content
+### `POST - /api/cms/pages/create/page` creates a new page
+- need to pass `page_name`
+### `POST - /api/cms/pages/update/{page_name}.html` update an existing page
+- need to pass `html_code`
+### `DELETE - /api/cms/pages/{page_name}.html` delete a page
+
