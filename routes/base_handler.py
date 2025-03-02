@@ -21,10 +21,28 @@ class BaseHandler(http.server.SimpleHTTPRequestHandler):
 
         if session_id:
             user_data = sessions.session_operations.get_user_by_session_id(session_id)
-            return user_data[2], user_data[3]
+
+            if user_data:
+                return user_data[2], user_data[3]
+            else:
+                return None, None
 
         self.send_response(302)
         self.send_header("Content-type", "text/html")
         self.send_header("Location", "/user/login")
         self.end_headers()
         return None, None
+
+    def _api_get_authenticated_user(self):
+        """Retrieve user data from session or redirect if unauthorized."""
+        cookie_header = self.headers.get('Cookie')
+        session_id = sessions.session_operations.get_session_from_cookies(cookie_header)
+
+        if session_id:
+            user_data = sessions.session_operations.get_user_by_session_id(session_id)
+            print(user_data)
+
+            if user_data:
+                return user_data[2], user_data[3]
+            else:
+                return None, None

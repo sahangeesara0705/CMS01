@@ -1,6 +1,7 @@
 import psycopg2
 import os
 import uuid
+import cms_utils.uuid
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler
 
@@ -115,6 +116,9 @@ def get_session(session_id):
     return session
 
 def get_user_by_session_id(session_id):
+    if not cms_utils.uuid.is_valid_uuid(session_id):
+        return None
+
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''

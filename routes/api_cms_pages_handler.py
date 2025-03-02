@@ -10,7 +10,7 @@ class APICMSPagesHandler(BaseHandler):
 
         # list all pages
         if parsed_url.path == "/api/cms/pages/list":
-            name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
+            name, avatar_url = self._api_get_authenticated_user()
             if name:
                 pages_directory = "pages"
                 if os.path.exists(pages_directory) and os.path.isdir(pages_directory):
@@ -24,6 +24,11 @@ class APICMSPagesHandler(BaseHandler):
                         "success": False,
                         "message": "Pages directory not found"
                     }, 404)
+            else:
+                self.send_json_response({
+                    "success": False,
+                    "message": "Unauthorized"
+                }, 403)
             return
 
 

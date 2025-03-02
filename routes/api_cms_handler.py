@@ -34,6 +34,12 @@ class APICMSHandler(BaseHandler):
                         "success": False,
                         "message": "Pages directory not found"
                     }, 404)
+            else:
+                self.send_json_response({
+                    "success": False,
+                    "message": "Unauthorized"
+                }, 403)
+
             return
 
         self.send_json_response({
