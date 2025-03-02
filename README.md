@@ -2,7 +2,7 @@
 A Content Management System written in Python, HTML, CSS and JavaScript
 
 ## CMS API
-`GET - /api/cms/welcome` get welcome message
+##### `GET - /api/cms/welcome` get welcome message
 
 ## Page Management
 ### `GET - /api/cms/pages/list` list all available pages
