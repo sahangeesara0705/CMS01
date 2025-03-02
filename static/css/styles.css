@@ -192,3 +192,7 @@ header .user-box .name {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+.info-bar {
+    width: 300px;
+    background-color: #dddddd;
+}

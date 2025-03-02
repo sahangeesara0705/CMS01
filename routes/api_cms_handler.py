@@ -1,6 +1,7 @@
 import html
 import re
 import os
+import mimetypes
 from urllib.parse import urlparse, parse_qs
 from routes.base_handler import BaseHandler
 
@@ -40,6 +41,25 @@ class APICMSHandler(BaseHandler):
                     "message": "Unauthorized"
                 }, 403)
 
+            return
+
+        if parsed_url.path == "/api/cms/list_files":
+            files = os.listdir("uploads")
+            file_info = []
+
+            for file in files:
+                file_path = os.path.join("uploads", file)
+                mime_type = mimetypes.guess_type(file_path)
+                file_size = os.path.getsize(file_path) if os.path.isfile(file_path) else 0
+
+                file_info.append({
+                    "name": file,
+                    "mime_type": mime_type or "unknown",
+                    "size": file_size
+                })
+
+            response = {"files": file_info}
+            self.send_json_response(response, 200)
             return
 
         self.send_json_response({

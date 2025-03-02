@@ -38,6 +38,14 @@ class CMSHandler(BaseHandler):
                     "avatar_url": avatar_url
                 })
             return
+        elif parsed_url.path == "/cms/files_list":
+            name, avatar_url = self._get_authenticated_user()
+            if name:
+                server.serve_html.serve_html_template(self, "cms_templates/files_list.html", {
+                    "name": name,
+                    "avatar_url": avatar_url,
+                })
+            return
         edit_match = re.match(r"^/cms/edit/([\w-]+)\.html$", parsed_url.path)
         if edit_match:
             page_name = edit_match.group(1)
