@@ -2,7 +2,8 @@ import jwt
 import datetime
 import hashlib
 import uuid
-from urllib.parse import urlparse, parse_qs
+import json
+from urllib.parse import urlparse, parse_qs, parse_qsl
 import sessions.session_operations
 from routes.base_handler import BaseHandler
 
@@ -12,13 +13,18 @@ class APIAuthHandler(BaseHandler):
     def do_POST(self):
         parsed_url = urlparse(self.path)
         content_length = int(self.headers.get('Content-Length', 0))
-        post_data = self.rfile.read(content_length) if content_length > 0 else b""
-        post_params = parse_qs(post_data.decode('utf-8')) if post_data else {}
+        post_data = self.rfile.read(content_length).decode('utf-8')
+        if self.headers.get('Content-Type') == "application/json":
+            post_params = json.loads(post_data)
+        else:
+            post_params = dict(parse_qsl(post_data))
+        # post_params = parse_qs(post_data.decode('utf-8')) if post_data else {}
 
         if parsed_url.path == "/api/auth/register":
-            name = post_params.get("name", [""])[0].strip()
-            email = post_params.get("email", [""])[0].strip()
-            password = post_params.get("password", [""])[0].strip()
+            print(post_params)
+            name = post_params.get("name")
+            email = post_params.get("email")
+            password = post_params.get("password")
 
             if not name or not email or not password:
                 self.send_json_response({
@@ -48,8 +54,9 @@ class APIAuthHandler(BaseHandler):
                 })
 
         elif parsed_url.path == "/api/auth/login":
-            email = post_params.get("email", [""])[0].strip()
-            password = post_params.get("password", [""])[0].strip()
+            print(post_data)
+            email = post_params.get("email")
+            password = post_params.get("password")
 
             if not email or not password:
                 self.send_json_response({

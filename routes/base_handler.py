@@ -9,8 +9,14 @@ SECRET_KEY = "cms01"
 JWT_BLACKLIST = set()
 
 class BaseHandler(http.server.SimpleHTTPRequestHandler):
+    def do_OPTIONS(self):
+        """Handle CORS preflight requests"""
+        self.send_response(200)
+        self._set_cors_headers()
+        self.end_headers()
     def send_json_response(self, data, status_code=200):
         self.send_response(status_code)
+        self._set_cors_headers()
         self.send_header("Content-type", "application/json")
         self.end_headers()
         self.wfile.write(json.dumps(data).encode("utf-8"))
@@ -112,3 +118,10 @@ class BaseHandler(http.server.SimpleHTTPRequestHandler):
                 "success": False,
                 "message": "Invalid token"
             }, 401)
+
+    def _set_cors_headers(self):
+        """ Set CORS headers to allow frontend requests """
+        self.send_header("Access-Control-Allow-Origin", "http://localhost:5173")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
+        self.send_header("Access-Control-Allow-Credentials", "true")
