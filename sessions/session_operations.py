@@ -28,6 +28,8 @@ def setup_database():
             id SERIAL PRIMARY KEY,
             user_id TEXT UNIQUE NOT NULL,
             name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT,
             profile_image_url TEXT,
             sign_in_type TEXT NOT NULL,
             access_token TEXT NOT NULL,
@@ -78,19 +80,21 @@ def set_session(user_id, ip_address, fingerprint_hash):
     cookie["session_id"]["httponly"] = True
     return cookie
 
-def set_user(user_id, name, profile_image_url, sign_in_type, access_token, access_token_secret):
+def set_user(user_id, name, email, password_hash, profile_image_url, sign_in_type, access_token, access_token_secret):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('''
-        INSERT INTO "User" (user_id, name, profile_image_url, sign_in_type, access_token, access_token_secret)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO "User" (user_id, name, email, password_hash, profile_image_url, sign_in_type, access_token, access_token_secret)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (user_id) DO UPDATE SET
         name = EXCLUDED.name,
+        email = EXCLUDED.email,
+        password_hash = EXCLUDED.password_hash,
         profile_image_url = EXCLUDED.profile_image_url,
         sign_in_type = EXCLUDED.sign_in_type,
         access_token = EXCLUDED.access_token,
         access_token_secret = EXCLUDED.access_token_secret;
-    ''', (user_id, name, profile_image_url, sign_in_type, access_token, access_token_secret))
+    ''', (user_id, name, email, password_hash, profile_image_url, sign_in_type, access_token, access_token_secret))
 
     # cur.execute('''
     #         INSERT INTO "User" (user_id, name, profile_image_url, sign_in_type, access_token, access_token_secret)

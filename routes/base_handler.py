@@ -25,6 +25,10 @@ class BaseHandler(http.server.SimpleHTTPRequestHandler):
             if user_data:
                 return user_data[2], user_data[3]
             else:
+                self.send_response(302)
+                self.send_header("Content-type", "text/html")
+                self.send_header("Location", "/user/login")
+                self.end_headers()
                 return None, None
 
         self.send_response(302)
