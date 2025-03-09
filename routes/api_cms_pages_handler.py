@@ -1,29 +1,18 @@
 import html
 import re
 import os
-import mimetypes
 from urllib.parse import urlparse, parse_qs
 from routes.base_handler import BaseHandler
 
-class APICMSHandler(BaseHandler):
+class APICMSPagesHandler(BaseHandler):
     def do_GET(self):
         parsed_url = urlparse(self.path)
-        if parsed_url.path == "/api/cms/welcome":
-            name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
-            if name:
-                self.send_json_response({
-                    "success": True,
-                    "name": name,
-                    "avatar_url": avatar_url,
-                    "message": f"Welcome, {name}!"
-                }, 200)
-            return
-        elif parsed_url.path == "/api/cms/list_pages":
-            name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
 
-            if name:
+        # list all pages
+        if parsed_url.path == "/api/cms/pages/list":
+            user = self._api_get_authenticated_user_jwt()
+            if user:
                 pages_directory = "pages"
-
                 if os.path.exists(pages_directory) and os.path.isdir(pages_directory):
                     pages = [
                         file for file in os.listdir(pages_directory)
@@ -40,37 +29,51 @@ class APICMSHandler(BaseHandler):
                     "success": False,
                     "message": "Unauthorized"
                 }, 403)
-
             return
 
-        if parsed_url.path == "/api/cms/list_files":
-            files = os.listdir("uploads")
-            file_info = []
 
-            for file in files:
-                file_path = os.path.join("uploads", file)
-                mime_type = mimetypes.guess_type(file_path)
-                file_size = os.path.getsize(file_path) if os.path.isfile(file_path) else 0
-
-                file_info.append({
-                    "name": file,
-                    "mime_type": mime_type or "unknown",
-                    "size": file_size
-                })
-
-            response = {"files": file_info}
-            self.send_json_response(response, 200)
+        # get page details
+        edit_match = re.match(r"^/api/cms/pages/get/([\w-]+)\.html$", parsed_url.path)
+        if edit_match:
+            page_name = edit_match.group(1)
+            name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
+            if name:
+                page_path = f"pages/{page_name}.html"
+                if os.path.exists(page_path):
+                    with open(page_path, "r", encoding="utf-8") as file:
+                        page_content = file.read()
+                    page_content = "\n".join(page_content.splitlines()).strip()
+                    encoded_html = html.escape(page_content)
+                    self.send_json_response({
+                        "success": True,
+                        "page_name": page_name,
+                        "html_code": page_content,
+                        "message": f"Page {page_name} loaded successfully"
+                    })
+                else:
+                    self.send_json_response({
+                        "success": False,
+                        "message": f"Page {page_name}.html not found"
+                    })
             return
 
+
+
+        # fallback
         self.send_json_response({
             "success": False,
             "message": "Page not found"
         }, 404)
 
+
+
     def do_POST(self):
         parsed_url = urlparse(self.path)
 
-        if parsed_url.path == "/api/cms/edit/new_page":
+
+
+        # create a new page
+        if parsed_url.path == "/api/cms/pages/create/page":
             name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
 
             if name:
@@ -118,7 +121,10 @@ class APICMSHandler(BaseHandler):
                     }, 409)
                 return
 
-        edit_match = re.match(r"^/api/cms/edit/([\w-]+)\.html", parsed_url.path)
+
+
+        # update a page
+        edit_match = re.match(r"^/api/cms/pages/update/([\w-]+)\.html", parsed_url.path)
         if edit_match:
             page_name = edit_match.group(1)
             name, avatar_url = self._get_authenticated_user() # TODO - need to change to api
@@ -165,9 +171,12 @@ class APICMSHandler(BaseHandler):
                 "message": "Page not found"
             }, 404)
 
+
+
+    # delete a page
     def do_DELETE(self):
         parsed_url = urlparse(self.path)
-        delete_match = re.match(r"^/api/cms/delete/([\w-]+)\.html$", parsed_url.path)
+        delete_match = re.match(r"^/api/cms/pages/delete/([\w-]+)\.html$", parsed_url.path)
         if delete_match:
             page_name = delete_match.group(1)
             name, avatar_url = self._get_authenticated_user() # TODO - need to change to api

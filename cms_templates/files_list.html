@@ -30,20 +30,16 @@
             </a>
         </div>
         <div class="toolbar-1-page-list">
+
         </div>
     </div>
     <div class="cms-wrapper-2">
-        <div class="toolbar-2">
-            <a href="#">Home</a>
-            <span class="seperator">/</span>
-            <a href="#">{{page_name}}.html</a>
+        <div class="page-list-container">
+            <ul id="file-list" class="page-list"></ul>
         </div>
-        <div class="content-area">
-            <form class="edit-form" action="{{edit_path}}" method="post">
-                <textarea class="text-editor" name="html_code">{{page_content}}</textarea>
-                <button class="submit-button" type="submit">Save</button>
-            </form>
-        </div>
+    </div>
+    <div class="info-bar">
+        <div id="file-info" class="file-info"></div>
     </div>
 </div>
 

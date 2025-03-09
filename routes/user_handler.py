@@ -21,6 +21,11 @@ class UserHandler(BaseHandler):
                     self.send_header("Content-type", "text/html")
                     self.send_header("Location", "/cms/welcome")
                     self.end_headers()
+                else:
+                    server.serve_html.serve_html_template(self, "cms_templates/login.html", {
+                        "github_authentication_url": "/user/login/github",
+                        "x_authentication_url": "/user/login/x"
+                    })
             else:
                 server.serve_html.serve_html_template(self, "cms_templates/login.html", {
                     "github_authentication_url": "/user/login/github",
@@ -51,12 +56,14 @@ class UserHandler(BaseHandler):
             user_data = user_management.github_oauth_handler.get_user_data(access_token)
             user_id = user_data["id"]
             screen_name = user_data["login"]
+            email = user_data["email"]
             name = user_data["name"]
             avatar_url = user_data["avatar_url"]
-            user_unique_id = sessions.session_operations.get_user_by_user_id(user_id)[0]
 
             # cookie = sessions.session_operations.set_session(user_id, access_token, "", screen_name, name, avatar_url)
-            user_type_cookie = sessions.session_operations.set_user(user_id, name, avatar_url, "GitHub", access_token, "")
+            user_type_cookie = sessions.session_operations.set_user(user_id, name, email, "abc", avatar_url, "GitHub", access_token, "")
+            user = sessions.session_operations.get_user_by_user_id(user_id)
+            user_unique_id = user[0]
             session_cookie = sessions.session_operations.set_session(user_unique_id, "", "")
 
             self.send_response(302)

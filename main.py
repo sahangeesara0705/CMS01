@@ -3,16 +3,39 @@ import os
 from routes.user_handler import UserHandler
 from routes.cms_handler import CMSHandler
 from routes.api_cms_handler import APICMSHandler
+from routes.api_cms_pages_handler import APICMSPagesHandler
+from routes.api_cms_files_handler import APICMSFilesHandler
+from routes.api_auth_handler import APIAuthHandler
 
 PORT = 8000
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+class StaticFileHandler(http.server.SimpleHTTPRequestHandler):
+    STATIC_DIR = os.path.abspath("static")
+
+    def translate_path(self, path):
+        """Translate URL path to filesystem path, ensuring security."""
+        if path.startswith("/static/"):
+            path = path[len("/static/"):]
+            safe_path = os.path.normpath(os.path.join(self.STATIC_DIR, path))
+
+            print(safe_path)
+
+            if not safe_path.startswith(self.STATIC_DIR):
+                self.send_error(403, "Forbidden")
+                return None
+            return safe_path
+        return super().translate_path(path)
+
 class MainRouter:
     ROUTES = {
         "/user": UserHandler,
         "/cms": CMSHandler,
-        "/api/cms": APICMSHandler
+        "/api/cms/pages": APICMSPagesHandler,
+        "/api/cms/files": APICMSFilesHandler,
+        "/api/cms": APICMSHandler,
+        "/api/auth": APIAuthHandler
     }
 
     def get_handler(self, path):
@@ -30,8 +53,10 @@ class RequestDispatcher(http.server.SimpleHTTPRequestHandler):
             self.__class__ = handler_class
             handler_class.do_GET(self)
         elif self.path.startswith("/static/"):
-            self.path = self.path.lstrip("/")
-            return http.server.SimpleHTTPRequestHandler.do_GET(self)
+            self.__class__ = StaticFileHandler
+            StaticFileHandler.do_GET(self)
+            # self.path = self.path.lstrip("/")
+            # return http.server.SimpleHTTPRequestHandler.do_GET(self)
         else:
             self.send_error(404, "Route not found")
 
@@ -42,6 +67,16 @@ class RequestDispatcher(http.server.SimpleHTTPRequestHandler):
             self.protocol_version = "HTTP/1.1"
             self.__class__ = handler_class
             handler_class.do_POST(self)
+        else:
+            self.send_error(405, "Method Not Allowed")
+
+    def do_DELETE(self):
+        router = MainRouter()
+        handler_class = router.get_handler(self.path)
+        if handler_class and hasattr(handler_class, "do_DELETE"):
+            self.protocol_version = "HTTP/1.1"
+            self.__class__ = handler_class
+            handler_class.do_DELETE(self)
         else:
             self.send_error(405, "Method Not Allowed")
 
