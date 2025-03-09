@@ -83,17 +83,20 @@ def set_session(user_id, ip_address, fingerprint_hash):
 def set_user(user_id, name, email, password_hash, profile_image_url, sign_in_type, access_token, access_token_secret):
     conn = get_db_connection()
     cur = conn.cursor()
+    cur.execute('SELECT 1 FROM "User" WHERE email = %s', (email,))
+    if cur.fetchone():
+        return None
     cur.execute('''
         INSERT INTO "User" (user_id, name, email, password_hash, profile_image_url, sign_in_type, access_token, access_token_secret)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (user_id) DO UPDATE SET
-        name = EXCLUDED.name,
-        email = EXCLUDED.email,
-        password_hash = EXCLUDED.password_hash,
-        profile_image_url = EXCLUDED.profile_image_url,
-        sign_in_type = EXCLUDED.sign_in_type,
-        access_token = EXCLUDED.access_token,
-        access_token_secret = EXCLUDED.access_token_secret;
+            name = EXCLUDED.name,
+            email = EXCLUDED.email,
+            password_hash = EXCLUDED.password_hash,
+            profile_image_url = EXCLUDED.profile_image_url,
+            sign_in_type = EXCLUDED.sign_in_type,
+            access_token = EXCLUDED.access_token,
+            access_token_secret = EXCLUDED.access_token_secret
     ''', (user_id, name, email, password_hash, profile_image_url, sign_in_type, access_token, access_token_secret))
 
     # cur.execute('''
@@ -144,6 +147,18 @@ def get_user_by_user_id(user_id):
     user = cur.fetchone()
     cur.close()
     conn.close()
+    return user
+
+def get_user_by_email_and_password(email, password_hash):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT user_id, name, profile_image_url FROM "User" WHERE email= %s AND password_hash = %s', (email, password_hash))
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not user:
+        return None
     return user
 
 setup_database()

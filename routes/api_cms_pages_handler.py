@@ -10,8 +10,8 @@ class APICMSPagesHandler(BaseHandler):
 
         # list all pages
         if parsed_url.path == "/api/cms/pages/list":
-            name, avatar_url = self._api_get_authenticated_user()
-            if name:
+            user = self._api_get_authenticated_user_jwt()
+            if user:
                 pages_directory = "pages"
                 if os.path.exists(pages_directory) and os.path.isdir(pages_directory):
                     pages = [
