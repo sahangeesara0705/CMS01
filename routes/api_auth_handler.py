@@ -6,6 +6,7 @@ import json
 from urllib.parse import urlparse, parse_qs, parse_qsl
 import sessions.session_operations
 from routes.base_handler import BaseHandler
+from logs.activities_operations import insert_activity
 
 JWT_SECRET_KEY = "cms01"
 
@@ -43,18 +44,27 @@ class APIAuthHandler(BaseHandler):
             )
 
             if id:
+                payload = {
+                    "user_id": user_id,
+                    "email": email,
+                    "name": name,
+                    "profile_image_url": avatar_url,
+                    "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+                }
+                token = jwt.encode(payload, JWT_SECRET_KEY, algorithm="HS256")
+
                 self.send_json_response({
                     "success": True,
-                    "cookie": "User created successfully"
+                    "message": "User created and logged in successfully",
+                    "token": token
                 })
             else:
                 self.send_json_response({
                     "success": False,
-                    "cookie": "User already exists"
+                    "message": "User already exists"
                 })
 
         elif parsed_url.path == "/api/auth/login":
-            print(post_data)
             email = post_params.get("email")
             password = post_params.get("password")
 
@@ -87,6 +97,7 @@ class APIAuthHandler(BaseHandler):
             }
             token = jwt.encode(payload, JWT_SECRET_KEY, algorithm="HS256")
 
+            insert_activity(email, "login", f"Login user '{name}'")
             self.send_json_response({
                 "success": True,
                 "message": "Authentication successful",

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component><name>Header</name><html>
+    &lt;header&gt;
+        &lt;div class="logo"&gt;
+            &lt;img src="" title="logo" alt="logo"&gt;
+        &lt;/div&gt;
+        &lt;div class="menu"&gt;
+            &lt;ul&gt;
+                &lt;li&gt;
+                    &lt;a href="#"&gt;Page 1&lt;/a&gt;
+                &lt;/li&gt;
+                &lt;li&gt;
+                    &lt;a href="#"&gt;Page 2&lt;/a&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/header&gt;
+    </html><versions><version><edited-by>sahan@gmail.com</edited-by><edited-at>2025-04-26</edited-at><html>
+            &lt;header&gt;&lt;/header&gt;
+            </html></version><version><edited-by>sahan@gmail.com</edited-by><edited-at>2025-04-26</edited-at><html>
+            &lt;header&gt;
+                &lt;div class="logo"&gt;
+                    &lt;img src="" title="logo" alt="logo"&gt;
+                &lt;/div&gt;
+            &lt;/header&gt;
+            </html></version></versions></component>

@@ -6,6 +6,9 @@ from routes.api_cms_handler import APICMSHandler
 from routes.api_cms_pages_handler import APICMSPagesHandler
 from routes.api_cms_files_handler import APICMSFilesHandler
 from routes.api_auth_handler import APIAuthHandler
+from routes.api_user_handler import APIUserHandler
+from routes.api_cms_logs_handler import APICMSLogsHandler
+from routes.api_cms_pages_editor_handler import APICMSPagesEditorHandler
 
 PORT = 8000
 
@@ -32,10 +35,13 @@ class MainRouter:
     ROUTES = {
         "/user": UserHandler,
         "/cms": CMSHandler,
+        "/api/cms/pages/editor": APICMSPagesEditorHandler,
         "/api/cms/pages": APICMSPagesHandler,
         "/api/cms/files": APICMSFilesHandler,
+        "/api/cms/logs": APICMSLogsHandler,
         "/api/cms": APICMSHandler,
-        "/api/auth": APIAuthHandler
+        "/api/auth": APIAuthHandler,
+        "/api/users": APIUserHandler
     }
 
     def get_handler(self, path):

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<page>
+    <title>Home</title>
+    <created-by>sahan@gmail.com</created-by>
+    <created-at>2025-04-26</created-at>
+    <components>
+        <component>header</component>
+        <component>footer</component>
+    </components>
+    <html>
+        <component>header</component>
+        <component>footer</component>
+    </html>
+</page>

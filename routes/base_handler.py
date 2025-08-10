@@ -1,5 +1,6 @@
 import http.server
 import json
+import time
 
 import jwt
 
@@ -19,6 +20,7 @@ class BaseHandler(http.server.SimpleHTTPRequestHandler):
         self._set_cors_headers()
         self.send_header("Content-type", "application/json")
         self.end_headers()
+        # time.sleep(5)
         self.wfile.write(json.dumps(data).encode("utf-8"))
 
     def redirect(self, new_url: str):
@@ -122,6 +124,6 @@ class BaseHandler(http.server.SimpleHTTPRequestHandler):
     def _set_cors_headers(self):
         """ Set CORS headers to allow frontend requests """
         self.send_header("Access-Control-Allow-Origin", "http://localhost:5173")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE")
         self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
         self.send_header("Access-Control-Allow-Credentials", "true")

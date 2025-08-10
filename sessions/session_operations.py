@@ -5,9 +5,9 @@ import cms_utils.uuid
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler
 
-DB_NAME = "postgres"
-DB_USER = "postgres"
-DB_PASSWORD = "abc"
+DB_NAME = "cms01"
+DB_USER = "cms01"
+DB_PASSWORD = "12345678cms01"
 DB_HOST = "localhost"
 DB_PORT = "5432"
 
